@@ -1,8 +1,7 @@
 package pl.slayful.abyss
 
-class ExplorationBoard(deck: ExplorationDeck) {
+class ExplorationBoard(deck: ExplorationDeck, council: Council) {
   val spotNumber: Int = 5
-
   var monsterLevel: Int = 0
   var explored = List[ExplorationCard]()
 
@@ -13,26 +12,27 @@ class ExplorationBoard(deck: ExplorationDeck) {
     explored = deck.explore() :: explored
     explored.head match {
       case m: MonsterExplorationCard => monsterLevel = monsterLevel + 1
+      case m: AllyExplorationCard => print("Ally")
     }
   }
 
-  def accept():ExplorationReward = {
+  def accept(): ExplorationReward = {
     val accepted = explored.head
 
     explored foreach {
-      x => x match {
-        case m: MonsterExplorationCard => deck.turnIn(m)
-//        case m: AllyExplorationCard => council.add(m)
-      }
+      case m: MonsterExplorationCard => deck.turnIn(m)
+      case m: AllyExplorationCard => if(accepted != m) council.add(m)
     }
 
     explored = List[ExplorationCard]()
 
     accepted match {
-      case m: MonsterExplorationCard => {
-       monsterLevel = 0
+      case m: MonsterExplorationCard =>
+        monsterLevel = 0
         new MonsterExplorationReward(monsterLevel, explored.size)
-      }
+      case m: AllyExplorationCard =>
+        new AllyExplorationReward
     }
   }
+
 }
