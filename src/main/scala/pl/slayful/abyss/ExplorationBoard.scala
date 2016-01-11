@@ -1,17 +1,26 @@
 package pl.slayful.abyss
 
 class ExplorationBoard(deck: ExplorationDeck) {
+  val spotNumber: Int = 5
 
-  var monsterLevel = 0
+  var monsterLevel: Int = 0
   var explored = List[ExplorationCard]()
-
-  def explore() = explored = deck.explore() :: explored
-
-  def pass() = {
-    if (explored.isEmpty) {
-      throw new IllegalStateException("Cannot pass nothing")
+  def explore() = {
+    if (explored.size >= spotNumber) {
+      throw new IllegalStateException()
     }
-    monsterLevel = monsterLevel + 1
+    explored = deck.explore() :: explored
+    explored.head match {
+      case m: MonsterExplorationCard => monsterLevel = monsterLevel + 1
+    }
   }
 
+  def accept():ExplorationReward = {
+    explored.head match {
+      case m: MonsterExplorationCard => {
+       monsterLevel = 0
+        new MonsterExplorationReward(monsterLevel, explored.size)
+      }
+    }
+  }
 }
