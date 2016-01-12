@@ -43,6 +43,7 @@ class ExplorationBoardSpec extends FlatSpec with Matchers {
   "Accepting an ally" should "yield a reward not reset the monster level" in {
     val deck = new ExplorationDeck(List(new MonsterExplorationCard, new AllyExplorationCard))
     val board = new ExplorationBoard(deck, new Council)
+
     board.monsterLevel should be (0)
     board.explore()
     board.monsterLevel should be (1)
@@ -64,6 +65,30 @@ class ExplorationBoardSpec extends FlatSpec with Matchers {
     board.accept()
     council.allies.size should be (1)
     assert(council.allies.head.isInstanceOf[AllyExplorationCard])
+  }
+
+  "Buying a card" should "take it off the queue" in {
+    val council = new Council
+    val deck = new ExplorationDeck(List(new AllyExplorationCard))
+    val board = new ExplorationBoard(deck, council)
+
+    council.allies.size should be (0)
+    board.explore()
+    val card = board.buy()
+    assert(card.isInstanceOf[AllyExplorationCard])
+    board.explored.size should be (0)
+  }
+
+  "Trying to buy a monster card" should "fail" in {
+    val council = new Council
+    val deck = new ExplorationDeck(List(new MonsterExplorationCard))
+    val board = new ExplorationBoard(deck, council)
+
+    council.allies.size should be (0)
+    board.explore()
+    intercept[IllegalStateException] {
+      board.buy()
+    }
   }
 
 }

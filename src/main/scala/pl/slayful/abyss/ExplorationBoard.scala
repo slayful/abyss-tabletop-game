@@ -1,6 +1,7 @@
 package pl.slayful.abyss
 
 class ExplorationBoard(deck: ExplorationDeck, council: Council) {
+
   val spotNumber: Int = 5
   var monsterLevel: Int = 0
   var explored = List[ExplorationCard]()
@@ -34,5 +35,15 @@ class ExplorationBoard(deck: ExplorationDeck, council: Council) {
         new AllyExplorationReward
     }
   }
+
+  def buy(): AllyExplorationCard = {
+    explored.head match {
+      case card: AllyExplorationCard =>
+        explored = explored.tail
+        card
+      case _ => throw new IllegalStateException
+    }
+  }
+
 
 }
